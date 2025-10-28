@@ -38,7 +38,7 @@ class PacketID(IntEnum):
         return f"PacketID.{self.name}"
     
     
-def parse_package(data: bytes):
+def parse_packet(data: bytes):
     """
     Parse the packet header from the given data bytes.
 
