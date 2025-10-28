@@ -1,14 +1,35 @@
 #! /usr/bin python3
 
+from telemetry_ingestor.listener import TelemetryListener
 from utils.network import get_default_ip_address
+import binascii
+import time
+
+def telemetry_data_callback(data):
+    # Print the hex representation of the data
+    print(f"Data (hex): {binascii.hexlify(data, sep=b':').decode('utf-8', errors='ignore')}")
+
 
 def main():
     """
     Main entry point for the OpenF1 HUD backend application.
     """
     ip_address = get_default_ip_address()
-
+    
     print(f"Configure your F1 game to send data to {ip_address}.")
+    
+    listener = TelemetryListener(data_callback=telemetry_data_callback)
+    listener.start()
+
+    print("Telemetry Listener started. Press Ctrl+C to stop the listener.")
+
+    try:
+        while True:
+            time.sleep(0.1)
+        
+    except KeyboardInterrupt:
+        listener.stop()
+        print("Telemetry Listener stopped.")
 
 if __name__ == "__main__":
     main()
