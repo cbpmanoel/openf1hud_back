@@ -1,6 +1,5 @@
 #! /usr/bin python3
 
-import binascii
 import time
 
 from telemetry_ingestor.listener import TelemetryListener
