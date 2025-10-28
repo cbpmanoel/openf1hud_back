@@ -3,48 +3,6 @@ from enum import StrEnum
 from .common import PacketStructureBase
 
 
-class EventStringCode(StrEnum):
-    """
-    Enumeration of event string codes for F1 2025 telemetry data events.
-    Each code represents a specific event that can occur.
-"""
-    SESSION_STARTED = "SSTA"        # Sent when the session starts
-    SESSION_ENDED = "SEND"          # Sent when the session ends
-    FASTEST_LAP = "FTLP"            # When a driver achieves the fastest lap
-    RETIREMENT = "RTMT"             # When a driver retires
-    DRS_ENABLED = "DRSE"            # Race control have enabled DRS
-    DRS_DISABLED = "DRSD"           # Race control have disabled DRS
-    TEAM_MATE_IN_PITS = "TMPT"      # Your team mate has entered the pits
-    CHEQUERED_FLAG = "CHQF"         # The chequered flag has been waved
-    RACE_WINNER = "RCWN"            # The race winner is announced
-    PENALTY_ISSUED = "PENA"         # A penalty has been issued - details in event
-    SPEED_TRAP_TRIGGERED = "SPTP"   # Speed trap has been triggered by fastest speed
-    START_LIGHTS = "STLG"           # Start lights - number shown
-    LIGHTS_OUT = "LGOT"             # Lights out
-    DRIVE_THROUGH_SERVED = "DTSV"   # Drive through penalty served
-    STOP_GO_SERVED = "SGSV"         # Stop go penalty served
-    FLASHBACK = "FLBK"              # Flashback activated
-    BUTTON_STATUS = "BUTN"          # Button status changed
-    RED_FLAG = "RDFL"               # Red flag shown
-    OVERTAKE = "OVTK"               # Overtake occurred
-    SAFETY_CAR = "SCAR"             # Safety car event - details in event
-    COLLISION = "COLL"              # Collision between two vehicles has occurred
-
-
-class PacketEventData(PacketStructureBase):
-    """
-    Structure representing the event data packet for F1 2025 telemetry data.
-    
-    Frequency: When the event occurs
-    Size: 45 bytes (29 bytes header + 4 bytes event code + 12 bytes event data)
-    Version: 1
-    """
-    _fields_ = [
-        ("event_string_code", ctypes.c_char * 4),   # Event string code
-        ("event_data", ctypes.c_uint8 * 12),        # Event data - structure depends on event type
-    ]
-
-
 class EventDataFastestLap(PacketStructureBase):
     """
     Structure representing the event data for a fastest lap event.
@@ -266,9 +224,48 @@ class EventDataButtons(PacketStructureBase):
     """
     Structure representing the event data for button presses.
     """
+    BUTTON_FLAGS = {
+        0x00000001: "Cross or A",
+        0x00000002: "Triangle or Y",
+        0x00000004: "Circle or B",
+        0x00000008: "Square or X",
+        0x00000010: "D-pad Left",
+        0x00000020: "D-pad Right",
+        0x00000040: "D-pad Up",
+        0x00000080: "D-pad Down",
+        0x00000100: "Options or Menu",
+        0x00000200: "L1 or LB",
+        0x00000400: "R1 or RB",
+        0x00000800: "L2 or LT",
+        0x00001000: "R2 or RT",
+        0x00002000: "Left Stick Click",
+        0x00004000: "Right Stick Click",
+        0x00008000: "Right Stick Left",
+        0x00010000: "Right Stick Right",
+        0x00020000: "Right Stick Up",
+        0x00040000: "Right Stick Down",
+        0x00080000: "Special",
+        0x00100000: "UDP Action 1",
+        0x00200000: "UDP Action 2",
+        0x00400000: "UDP Action 3",
+        0x00800000: "UDP Action 4",
+        0x01000000: "UDP Action 5",
+        0x02000000: "UDP Action 6",
+        0x04000000: "UDP Action 7",
+        0x08000000: "UDP Action 8",
+        0x10000000: "UDP Action 9",
+        0x20000000: "UDP Action 10",
+        0x40000000: "UDP Action 11",
+        0x80000000: "UDP Action 12",
+    }
+    
     _fields_ = [
         ("button_status", ctypes.c_uint32),  # Bit flags specifying which buttons are being pressed
     ]
+    
+    def get_pressed_buttons(self) -> list[str]:
+        pressed = [f"{name}" for flag, name in self.BUTTON_FLAGS.items() if self.button_status & flag]
+        return pressed
 
 
 class EventDataOvertake(PacketStructureBase):
@@ -314,3 +311,82 @@ class EventDataCollision(PacketStructureBase):
         ("vehicle1_idx", ctypes.c_uint8),  # Vehicle index of the first vehicle involved in the collision
         ("vehicle2_idx", ctypes.c_uint8),  # Vehicle index of the second vehicle involved in the collision
     ]
+
+
+################################################################
+
+
+class EventStringCode(StrEnum):
+    """
+    Enumeration of event string codes for F1 2025 telemetry data events.
+    Each code represents a specific event that can occur.
+    """
+    SESSION_STARTED = "SSTA"        # Sent when the session starts
+    SESSION_ENDED = "SEND"          # Sent when the session ends
+    FASTEST_LAP = "FTLP"            # When a driver achieves the fastest lap
+    RETIREMENT = "RTMT"             # When a driver retires
+    DRS_ENABLED = "DRSE"            # Race control have enabled DRS
+    DRS_DISABLED = "DRSD"           # Race control have disabled DRS
+    TEAM_MATE_IN_PITS = "TMPT"      # Your team mate has entered the pits
+    CHEQUERED_FLAG = "CHQF"         # The chequered flag has been waved
+    RACE_WINNER = "RCWN"            # The race winner is announced
+    PENALTY_ISSUED = "PENA"         # A penalty has been issued - details in event
+    SPEED_TRAP_TRIGGERED = "SPTP"   # Speed trap has been triggered by fastest speed
+    START_LIGHTS = "STLG"           # Start lights - number shown
+    LIGHTS_OUT = "LGOT"             # Lights out
+    DRIVE_THROUGH_SERVED = "DTSV"   # Drive through penalty served
+    STOP_GO_SERVED = "SGSV"         # Stop go penalty served
+    FLASHBACK = "FLBK"              # Flashback activated
+    BUTTON_STATUS = "BUTN"          # Button status changed
+    RED_FLAG = "RDFL"               # Red flag shown
+    OVERTAKE = "OVTK"               # Overtake occurred
+    SAFETY_CAR = "SCAR"             # Safety car event - details in event
+    COLLISION = "COLL"              # Collision between two vehicles has occurred
+
+
+EVENT_DATA_STRUCTURES_MAPPING = {
+    EventStringCode.FASTEST_LAP: EventDataFastestLap,
+    EventStringCode.RETIREMENT: EventDataRetirement,
+    EventStringCode.DRS_DISABLED: EventDataDRSDisabled,
+    EventStringCode.RACE_WINNER: EventDataRaceWinner,
+    EventStringCode.PENALTY_ISSUED: EventDataPenalty,
+    EventStringCode.SPEED_TRAP_TRIGGERED: EventDataSpeedTrap,
+    EventStringCode.START_LIGHTS: EventDataStartLights,
+    EventStringCode.DRIVE_THROUGH_SERVED: EventDataDriveThroughPenaltyServed,
+    EventStringCode.STOP_GO_SERVED: EventDataStopGoPenaltyServed,
+    EventStringCode.FLASHBACK: EventDataFlashback,
+    EventStringCode.BUTTON_STATUS: EventDataButtons,
+    EventStringCode.OVERTAKE: EventDataOvertake,
+    EventStringCode.SAFETY_CAR: EventDataSafetyCar,
+    EventStringCode.COLLISION: EventDataCollision,
+}
+
+
+class PacketEventData(PacketStructureBase):
+    """
+    Structure representing the event data packet for F1 2025 telemetry data.
+    
+    Frequency: When the event occurs
+    Size: 45 bytes (29 bytes header + 4 bytes event code + 12 bytes event data)
+    Version: 1
+    """
+    _fields_ = [
+        ("event_string_code", ctypes.c_char * 4),   # Event string code
+        ("event_data", ctypes.c_uint8 * 12),        # Event data - structure depends on event type
+    ]
+    
+    def interpret_event_payload(self) -> 'PacketStructureBase':
+        """
+        Interpret the event data based on the event string code.
+
+        Returns:
+            PacketStructureBase: The interpreted event data structure.
+        """
+        event_code = self.event_string_code.decode('utf-8')
+        
+        if event_code in EVENT_DATA_STRUCTURES_MAPPING:
+            event_data_class = EVENT_DATA_STRUCTURES_MAPPING[event_code]
+            raw_data = bytes(self.event_data)
+            return event_data_class.from_buffer_copy(raw_data)
+        
+        raise NotImplementedError(f"Event data structure for event code {event_code} not implemented.")

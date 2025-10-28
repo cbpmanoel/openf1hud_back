@@ -51,7 +51,9 @@ def parse_packet(data: bytes):
     header = PacketHeader.from_buffer_copy(data[:HEADER_SIZE])
     
     if header.packet_id == PacketID.EVENT:
-        return PacketEventData.from_buffer_copy(data[HEADER_SIZE:])
-    
+        packet = PacketEventData.from_buffer_copy(data[HEADER_SIZE:])
+        interpreted_packet = packet.interpret_event_payload()
+        return interpreted_packet
+
     raise NotImplementedError(f"Parser for PacketID {header.packet_id} not implemented.")
 
