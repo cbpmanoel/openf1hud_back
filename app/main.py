@@ -1,13 +1,18 @@
 #! /usr/bin python3
 
-from telemetry_ingestor.listener import TelemetryListener
-from utils.network import get_default_ip_address
 import binascii
 import time
 
+from telemetry_ingestor.listener import TelemetryListener
+from telemetry_ingestor.parser import PacketHeader, HEADER_SIZE
+
+from utils.network import get_default_ip_address
+
+
 def telemetry_data_callback(data):
     # Print the hex representation of the data
-    print(f"Data (hex): {binascii.hexlify(data, sep=b':').decode('utf-8', errors='ignore')}")
+    header = PacketHeader.from_buffer_copy(data[:HEADER_SIZE])
+    print(f"Received telemetry data: {header}")
 
 
 def main():
