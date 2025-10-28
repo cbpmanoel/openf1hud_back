@@ -3,15 +3,15 @@
 import time
 
 from telemetry_ingestor.listener import TelemetryListener
-from telemetry_ingestor.parser import PacketHeader, HEADER_SIZE
+from telemetry_ingestor.parser.parser import parse_packet
 
 from utils.network import get_default_ip_address
 
 
 def telemetry_data_callback(data):
     # Print the hex representation of the data
-    header = PacketHeader.from_buffer_copy(data[:HEADER_SIZE])
-    print(f"Received telemetry data: {header}")
+    packet = parse_packet(data)
+    print(f"Received telemetry data: {packet}")
 
 
 def main():
