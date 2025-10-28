@@ -46,7 +46,7 @@ def parse_packet(data: bytes):
         data (bytes): The raw data bytes received from the telemetry stream.
 
     Returns:
-        PacketHeader: The parsed packet header.
+        An instance of the appropriate packet data structure based on the PacketID.
     """
     header = PacketHeader.from_buffer_copy(data[:HEADER_SIZE])
     
