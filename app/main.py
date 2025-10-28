@@ -1,28 +1,33 @@
 #! /usr/bin python3
 
-import time
+import asyncio
 
 from utils.network import get_default_ip_address
-from telemetry_ingestor.service import start_packet_listener_service, shutdown_listener_service
+from telemetry_ingestor.listener import TelemetryListener
+from telemetry_ingestor.service import process_telemetry_data
 
-def main():
+listener = TelemetryListener(data_callback=process_telemetry_data)
+
+async def main():
     """
     Main entry point for the OpenF1 HUD backend application.
     """
-    ip_address = get_default_ip_address()
-    
-    print(f"Configure your F1 game to send data to {ip_address}.")
-
-    start_packet_listener_service()
-    print("Telemetry Listener started. Press Ctrl+C to stop the listener.")
-
     try:
-        while True:
-            time.sleep(0.1)
+        await listener.start()
+        print("Listener started successfully. Press Ctrl+C to stop.")
+        
+        await asyncio.Future()  # Run until interrupted
         
     except KeyboardInterrupt:
-        shutdown_listener_service()
+        print("Keyboard interrupt received. Stopping listener...")
+        
+    finally:
+        await listener.stop()
         print("Telemetry Listener stopped.")
 
 if __name__ == "__main__":
-    main()
+    ip_address = get_default_ip_address()
+    print(f"Configure your F1 game to send data to {ip_address}.")
+    
+    asyncio.run(main())
+    print("Application exited.")

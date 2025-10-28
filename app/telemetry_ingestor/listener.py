@@ -1,79 +1,88 @@
+import asyncio
 import socket
-from threading import Thread, Event
-from typing import Callable
+from typing import Callable, Coroutine
 
 #TODO: Implement proper logging and error handlings
 
 F1_TELEMETRY_PORT = 20777
 F1_TELEMETRY_HOST = ''
 
-SOCKET_TIMEOUT = 0.1
-SOCKET_BUFFER_SIZE = 1024
 
 class TelemetryListener:
-    def __init__(self,
-                 port: int = F1_TELEMETRY_PORT,
-                 host: str = F1_TELEMETRY_HOST,
-                 data_callback: Callable = None):
+
+    def __init__(self, port: int = F1_TELEMETRY_PORT, host: str = F1_TELEMETRY_HOST, data_callback: Callable = None):
         self._port = port
         self._host = host
-        self._socket = None
-        self._thread = None
-        self._stop_event = Event()
+        self._task = None
         self._data_callback = data_callback
-            
-    def _initialize_socket(self):
+
+    async def _listener_routine(self):
+        """
+        Main routine for listening to incoming telemetry data.
+        
+        It creates a UDP endpoint and waits for incoming data,
+        passing received data to the provided callback function.
+        """
         try:
-            if self._socket:
-                self._socket.close()
+            loop = asyncio.get_running_loop()
             
-            self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-            self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            self._socket.bind((self._host, self._port))
-            self._socket.settimeout(SOCKET_TIMEOUT)
-            print(f"Socket initialized on {self._host}:{self._port}")
+            # Manually creates the socket so we can use SO_REUSEADDR
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            sock.setblocking(False)
+            sock.bind((self._host, self._port))
             
-        except socket.error as e:
-            print(f"Socket error: {e}")
-            self._socket = None
-        
-    def _initialize_thread(self):
-        if self._thread is None or not self._thread.is_alive():
-            self._stop_event.clear()
-            self._thread = Thread(target=self._listener_routine, daemon=True)
+            transport, _ = await loop.create_datagram_endpoint(
+                lambda: UDPProtocol(self._data_callback),
+                sock=sock
+            )
 
-    def _listener_routine(self):
-        while not self._stop_event.is_set():
-            if self._socket is None:
-                print("Socket is not initialized.")
-                self._stop_event.set()
-                continue
-            
+            print(f"Telemetry Listener started on {self._host}:{self._port}")
+            await asyncio.Future()  # Run until cancelled
+        except asyncio.CancelledError:
+            print("Telemetry Listener routine cancelled.")
+        finally:
+            print("Closing Telemetry Listener transport.")
+            transport.close()
+
+    async def start(self):
+        """
+        Start the telemetry listener.
+        """
+        if self._task is None or self._task.done():
+            print("Starting Telemetry Listener...")
+            self._task = asyncio.create_task(self._listener_routine())
+
+    async def stop(self):
+        """
+        Stop the telemetry listener.
+        """
+        if self._task and not self._task.done():
+            print("Stopping Telemetry Listener...")
+            self._task.cancel()
             try:
-                data, _ = self._socket.recvfrom(SOCKET_BUFFER_SIZE)
-                
-                try:
-                    if self._data_callback:
-                        self._data_callback(data)
-                except Exception as e:
-                    print(f"Data callback error: {e}")
-                    continue
-                    
-            except socket.timeout:
-                continue
+                await self._task
+            except asyncio.CancelledError:
+                pass
+            finally:
+                print("Telemetry Listener stopped.")
+                self._task = None
 
-        if self._socket:
-            self._socket.close()
 
-    def start(self):
-        self._initialize_socket()
-        if self._socket:
-            self._initialize_thread()
-            self._thread.start()
+class UDPProtocol(asyncio.DatagramProtocol):
+    """
+    Helper class for asyncio UDP protocol handling.
+    """
 
-    def stop(self):
-        self._stop_event.set()
-        
-    def is_running(self) -> bool:
-        return self._thread is not None and self._thread.is_alive()
+    def __init__(self, data_callback: Callable[[bytes], Coroutine]):
+        self.data_callback = data_callback
 
+    def datagram_received(self, data: bytes, addr):
+        print(f"Data received from {addr}, length: {len(data)} bytes")
+        asyncio.create_task(self.data_callback(data))
+
+    def error_received(self, exc):
+        print(f"Error received: {exc}")
+
+    def connection_lost(self, exc):
+        print(f"Connection lost: {exc}")
