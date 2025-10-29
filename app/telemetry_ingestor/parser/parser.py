@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Type
 
 from .packets.common import PacketID, PacketStructureBase
@@ -10,7 +11,20 @@ PACKET_STRUCTURE_MAPPING: dict[PacketID, Type[PacketStructureBase]] = {
 }
 
 
-def parse_packet(data: bytes):
+@dataclass
+class ParsedPacket:
+    """
+    Container that represents a parsed telemetry packet.
+    """
+    header: PacketHeader
+    payload: PacketStructureBase
+    
+    @property
+    def packet_id(self) -> PacketID:
+        return PacketID(self.header.packet_id)
+
+
+def parse_packet(data: bytes) -> ParsedPacket:
     """
     Parse the packet header from the given data bytes.
     """
@@ -24,7 +38,7 @@ def parse_packet(data: bytes):
     except NotImplementedError:
         raise NotImplementedError(f"No parser implemented for PacketID {header.packet_id}")
     
-    return packet_data
+    return ParsedPacket(header=header, payload=packet_data)
 
 
 def _from_mapping(id: PacketID, data: bytes) -> PacketStructureBase:
