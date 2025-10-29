@@ -381,9 +381,11 @@ class PacketEventData(PacketStructureBase):
         """
         event_code = self.event_string_code.decode('utf-8')
         
-        if event_code in EVENT_DATA_STRUCTURES_MAPPING:
-            event_data_class = EVENT_DATA_STRUCTURES_MAPPING[event_code]
-            raw_data = bytes(self.event_data)
-            return event_data_class.from_buffer_copy(raw_data)
+        event_data_class = EVENT_DATA_STRUCTURES_MAPPING.get(event_code)
         
-        raise NotImplementedError(f"Event data structure for event code {event_code} not implemented.")
+        if not event_data_class:
+            raise NotImplementedError(f"Event data structure for event code {event_code} not implemented.")
+
+        raw_data = bytes(self.event_data)
+        
+        return event_data_class.from_buffer_copy(raw_data)
