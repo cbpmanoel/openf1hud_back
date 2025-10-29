@@ -1,35 +1,44 @@
 #! /usr/bin python3
 
-import asyncio
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
 
-from utils.network import get_default_ip_address
-from telemetry_ingestor.listener import TelemetryListener
-from telemetry_ingestor.service import process_telemetry_data
+from .utils.network import get_default_ip_address
+from .telemetry_ingestor.listener import TelemetryListener, F1_TELEMETRY_PORT
+from .telemetry_ingestor.service import process_telemetry_data
+
 
 listener = TelemetryListener(data_callback=process_telemetry_data)
 
-async def main():
+
+def print_startup_message(host_ip: str):
+    print(f"""
+Starting telemetry listener on {host_ip}:{F1_TELEMETRY_PORT}.
+Please ensure F1 2025 is configured to send telemetry data to this address.
+""")
+    
+    
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """
-    Main entry point for the OpenF1 HUD backend application.
+    Lifespan context manager for FastAPI application.
+    Starts the telemetry listener on startup and stops it on shutdown.
     """
+    
+    host_ip = await get_default_ip_address()
+    print_startup_message(host_ip)
     try:
         await listener.start()
-        print("Listener started successfully. Press Ctrl+C to stop.")
-        
-        await asyncio.Future()  # Run until interrupted
-        
-    except KeyboardInterrupt:
-        print("Keyboard interrupt received. Stopping listener...")
-    except asyncio.CancelledError:
-        print("Asyncio task was cancelled. Stopping listener...")
-        
+        yield
+    except Exception as e:
+        print(f"Error in lifespan context manager: {e}")
     finally:
         await listener.stop()
-        print("Telemetry Listener stopped.")
 
-if __name__ == "__main__":
-    ip_address = get_default_ip_address()
-    print(f"Configure your F1 game to send data to {ip_address}.")
-    
-    asyncio.run(main())
-    print("Application exited.")
+
+app = FastAPI(lifespan=lifespan)
+
+
+@app.get("/")
+def root():
+    return {"message": "F1 2025 Telemetry Ingestor is running."}
