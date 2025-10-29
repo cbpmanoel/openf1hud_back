@@ -375,12 +375,9 @@ class PacketEventData(PacketStructureBase):
         ("event_data", ctypes.c_uint8 * 12),        # Event data - structure depends on event type
     ]
     
-    def interpret_event_payload(self) -> 'PacketStructureBase':
+    def unpack_event_data(self) -> 'PacketStructureBase':
         """
-        Interpret the event data based on the event string code.
-
-        Returns:
-            PacketStructureBase: The interpreted event data structure.
+        Unpack the event data based on the event string code.
         """
         event_code = self.event_string_code.decode('utf-8')
         
