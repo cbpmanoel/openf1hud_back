@@ -1,5 +1,6 @@
 import ctypes
-from .common import PacketStructureBase
+from .common import PacketStructureBase, PacketID
+
 
 HEADER_SIZE = 29  # Size of the packet header in bytes
 
@@ -23,3 +24,9 @@ class PacketHeader(PacketStructureBase):
         ("player_car_index", ctypes.c_uint8),               # Index of player's car in the array
         ("secondary_player_car_index", ctypes.c_uint8),     # Index of secondary player's car in the array (splitscreen), 255 if no second player
     ]
+    
+    def get_packet_id(self) -> PacketID:
+        """
+        Get the PacketID enum for this packet header.
+        """
+        return PacketID(self.packet_id)
