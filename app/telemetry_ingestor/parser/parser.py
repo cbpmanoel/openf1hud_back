@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import Type
 
-from .packets.common import PacketID, PacketStructureBase
-from .packets.header import PacketHeader
-from .packets.event_data import PacketEventData
+from packets_2025.common import PacketID, PacketStructureBase
+from packets_2025.header import PacketHeader
+from packets_2025.event_data import PacketEventData
 
 
 PACKET_STRUCTURE_MAPPING: dict[PacketID, Type[PacketStructureBase]] = {
