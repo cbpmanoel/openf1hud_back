@@ -20,6 +20,8 @@ async def main():
         
     except KeyboardInterrupt:
         print("Keyboard interrupt received. Stopping listener...")
+    except asyncio.CancelledError:
+        print("Asyncio task was cancelled. Stopping listener...")
         
     finally:
         await listener.stop()
