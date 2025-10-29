@@ -1,24 +1,38 @@
-from .packets.header import PacketHeader, HEADER_SIZE
-from .packets.event_data import PacketEventData
-from .packets.common import PacketID
+from typing import Type
 
-    
+from .packets.common import PacketID, PacketStructureBase
+from .packets.header import PacketHeader
+from .packets.event_data import PacketEventData
+
+
+PACKET_STRUCTURE_MAPPING: dict[PacketID, Type[PacketStructureBase]] = {
+    PacketID.EVENT: PacketEventData,
+}
+
+
 def parse_packet(data: bytes):
     """
     Parse the packet header from the given data bytes.
-
-    Args:
-        data (bytes): The raw data bytes received from the telemetry stream.
-
-    Returns:
-        An instance of the appropriate packet data structure based on the PacketID.
     """
-    header = PacketHeader.from_buffer_copy(data[:HEADER_SIZE])
+    header = PacketHeader.from_buffer_copy(data)
+
+    try:
+        id = PacketID(header.packet_id)
+        packet_data = _from_mapping(id, data)
+    except ValueError:
+        raise ValueError(f"Unknown PacketID: {header.packet_id}")
+    except NotImplementedError:
+        raise NotImplementedError(f"No parser implemented for PacketID {header.packet_id}")
     
-    if header.packet_id == PacketID.EVENT:
-        packet = PacketEventData.from_buffer_copy(data[HEADER_SIZE:])
-        interpreted_packet = packet.unpack_event_data()
-        return interpreted_packet
+    return packet_data
 
-    raise NotImplementedError(f"Parser for PacketID {header.packet_id} not implemented.")
 
+def _from_mapping(id: PacketID, data: bytes) -> PacketStructureBase:
+    """
+    Helper function to create a packet structure instance from the mapping.
+    """
+    packet_class = PACKET_STRUCTURE_MAPPING.get(id)
+    if not packet_class:
+        raise NotImplementedError(f"No parser implemented for PacketID {id}")
+
+    return packet_class.from_buffer_copy(data)
