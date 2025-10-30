@@ -364,7 +364,7 @@ EVENT_DATA_STRUCTURES_MAPPING = {
 
 class PacketEventData(PacketStructureBase):
     """
-    Structure representing the event data packet for F1 2025 telemetry data.
+    This packet gives details of events that happen during the course of a session.
     
     Frequency: When the event occurs
     Size: 45 bytes (29 bytes header + 4 bytes event code + 12 bytes event data)
