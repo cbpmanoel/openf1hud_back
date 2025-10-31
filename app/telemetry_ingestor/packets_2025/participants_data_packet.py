@@ -1,6 +1,6 @@
 import ctypes
 from enum import IntEnum
-from .common import ON_OFF_SETTING, PacketStructureBase, MAX_CARS
+from .common import PacketStructureBase, MAX_CARS
 
 
 class AI_CONTROLLED(IntEnum):
@@ -255,7 +255,12 @@ class PLAYER_UDP_SETTING(IntEnum):
     PUBLIC = 1
 
 
-class PLAYER_SHOW_ONLINE_NAMES_SETTING(ON_OFF_SETTING): ...
+class PLAYER_SHOW_ONLINE_NAMES_SETTING(IntEnum):
+    """
+    Enumeration for player's show online names setting.
+    """
+    OFF = 0
+    ON = 1
 
 
 class PLAYER_PLATFORM(IntEnum):

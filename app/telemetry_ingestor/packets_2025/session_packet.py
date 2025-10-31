@@ -1,6 +1,6 @@
 import ctypes
 from enum import IntEnum
-from .common import PacketStructureBase, ON_OFF_SETTING
+from .common import PacketStructureBase
 
 #TODO: Find a good way to return enums/raw values
 
@@ -143,7 +143,12 @@ class FORECAST_ACCURACY(IntEnum):
     APPROXIMATE = 1
 
 
-class STEERING_ASSIST_LEVEL(ON_OFF_SETTING): ...
+class STEERING_ASSIST_LEVEL(IntEnum):
+    """
+    Enumeration for steering assist levels.
+    """
+    OFF = 0
+    ON = 1
 
 
 class BRAKING_ASSIST_LEVEL(IntEnum):
@@ -165,16 +170,36 @@ class GEARBOX_ASSIST_LEVEL(IntEnum):
     AUTOMATIC = 3
     
     
-class PIT_ASSIST_LEVEL(ON_OFF_SETTING): ...
+class PIT_ASSIST_LEVEL(IntEnum):
+    """
+    Enumeration for whether pit assist is enabled.
+    """
+    OFF = 0
+    ON = 1
 
 
-class PIT_RELEASE_ASSIST_LEVEL(ON_OFF_SETTING): ...
+class PIT_RELEASE_ASSIST_LEVEL(IntEnum):
+    """
+    Enumeration for whether pit release assist is enabled.
+    """
+    OFF = 0
+    ON = 1
 
 
-class ERS_ASSIST_LEVEL(ON_OFF_SETTING): ...
+class ERS_ASSIST_LEVEL(IntEnum):
+    """
+    Enumeration for whether ERS assist is enabled.
+    """
+    OFF = 0
+    ON = 1
 
 
-class DRS_ASSIST_LEVEL(ON_OFF_SETTING): ...
+class DRS_ASSIST_LEVEL(IntEnum):
+    """
+    Enumeration for whether DRS assist is enabled.
+    """
+    OFF = 0
+    ON = 1
 
 
 class DYNAMIC_RACING_LINE(IntEnum):
@@ -251,7 +276,12 @@ class TEMPERATURE_UNITS(IntEnum):
     FAHRENHEIT = 1
     
     
-class EQUAL_CAR_PERFORMANCE(ON_OFF_SETTING): ...
+class EQUAL_CAR_PERFORMANCE(IntEnum):
+    """
+    Enumeration for whether equal car performance is enabled.
+    """
+    OFF = 0
+    ON = 1
 
 
 class RECOVERY_MODE(IntEnum):
@@ -357,7 +387,12 @@ class MP_UNSAFE_PIT_RELEASE(IntEnum):
     OFF = 1
 
 
-class MP_OFF_FOR_GRIEFING(ON_OFF_SETTING): ...
+class MP_OFF_FOR_GRIEFING(IntEnum):
+    """
+    Enumeration for MP off for griefing setting.
+    """
+    OFF = 0
+    ON = 1
 
 
 class CORNER_CUTTING_STRINGENCY(IntEnum):
@@ -366,11 +401,16 @@ class CORNER_CUTTING_STRINGENCY(IntEnum):
     """
     REGULAR = 0
     STRICT = 1
-    
-    
-class PARC_FERME_RULES(ON_OFF_SETTING): ...
-    
-    
+
+
+class PARC_FERME_RULES_SETTING(IntEnum):
+    """
+    Enumeration for whether parc ferme rules are enabled.
+    """
+    OFF = 0
+    ON = 1
+
+
 class PIT_STOP_EXPERIENCE(IntEnum):
     """
     Enumeration for pit stop experience levels.
@@ -398,7 +438,12 @@ class SAFETY_CAR_EXPERIENCE(IntEnum):
     IMMERSIVE = 1
     
     
-class FORMATION_LAP_SETTING(ON_OFF_SETTING): ...
+class FORMATION_LAP_SETTING(IntEnum):
+    """
+    Enumeration for formation lap settings.
+    """
+    OFF = 0
+    ON = 1
 
 
 class FORMATION_LAP_EXPERIENCE(IntEnum):
@@ -419,10 +464,20 @@ class RED_FLAGS_LEVEL(IntEnum):
     INCREASED = 3
 
 
-class AFFECTS_LICENCE_LEVEL_SOLO(ON_OFF_SETTING): ...
+class AFFECTS_LICENCE_LEVEL_SOLO(IntEnum):
+    """
+    Enumeration for whether affects licence level in solo game is enabled.
+    """
+    OFF = 0
+    ON = 1
 
 
-class AFFECTS_LICENCE_LEVEL_MULTIPLAYER(ON_OFF_SETTING): ...
+class AFFECTS_LICENCE_LEVEL_MULTIPLAYER(IntEnum):
+    """
+    Enumeration for whether affects licence level in multiplayer is enabled.
+    """
+    OFF = 0
+    ON = 1
 
 
 class MarshalZone(PacketStructureBase):

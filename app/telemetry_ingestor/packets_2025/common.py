@@ -29,14 +29,6 @@ class PacketID(IntEnum):
     
     def __str__(self):
         return f"PacketID.{self.name}"
-    
-    
-class ON_OFF_SETTING(IntEnum):
-    """
-    Enumeration for On/Off settings.
-    """
-    OFF = 0
-    ON = 1
 
 
 class PacketStructureBase(ctypes.LittleEndianStructure):
