@@ -91,6 +91,6 @@ class PacketCarTelemetryData(PacketStructureBase):
         """
         Get the CarTelemetryData for a specific car index.
         """
-        if 0 <= index < 22:
+        if 0 <= index < MAX_CARS:
             return self.car_telemetry_data[index]
         raise IndexError("Car index out of range.")
