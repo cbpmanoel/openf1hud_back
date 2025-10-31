@@ -39,3 +39,10 @@ class PacketStructureBase(ctypes.LittleEndianStructure):
     def __repr__(self):
         field_values = ', '.join(f"{field[0]}={getattr(self, field[0])}" for field in self._fields_)
         return f"{self.__class__.__name__}({field_values})"
+    
+    @classmethod
+    def sizeof(cls):
+        """
+        Get the size of the structure in bytes.
+        """
+        return ctypes.sizeof(cls)
