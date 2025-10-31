@@ -77,7 +77,7 @@ class PacketCarTelemetryData(PacketStructureBase):
         ("suggested_gear", ctypes.c_int8),                    # Suggested gear for the player (1-8, 0 if no gear suggested)
     ]
 
-    def get_data_by_car_index(self, index: int) -> CarTelemetryData:
+    def by_car_index(self, index: int) -> CarTelemetryData:
         """
         Get the CarTelemetryData for a specific car index.
         """
