@@ -29,6 +29,19 @@ class WHEEL_POSITION_INDEX(IntEnum):
     REAR_RIGHT = 1
     FRONT_LEFT = 2
     FRONT_RIGHT = 3
+    
+    
+class MDF_PANEL_INDEX(IntEnum):
+    """
+    Enumeration for MFD (Multi-Function Display) panel indices for single player.
+    May vary depending on game mode.
+    """
+    CLOSED = 255
+    CAR_SETUP = 0
+    PITS = 1
+    DAMAGE = 2
+    ENGINE = 3
+    TEMPERATURES = 4
 
 
 class CarTelemetryData(PacketStructureBase):
@@ -66,19 +79,6 @@ class PacketCarTelemetryData(PacketStructureBase):
     Size: 1352 bytes
     Version: 1
     """
-    
-    class MDF_PANEL_INDEX(IntEnum):
-        """
-        Enumeration for MFD (Multi-Function Display) panel indices for single player.
-        May vary depending on game mode.
-        """
-        CLOSED = 255
-        CAR_SETUP = 0
-        PITS = 1
-        DAMAGE = 2
-        ENGINE = 3
-        TEMPERATURES = 4
-    
     
     _fields_ = [
         ("car_telemetry_data", CarTelemetryData * MAX_CARS),  # Array of telemetry data for all cars on track
