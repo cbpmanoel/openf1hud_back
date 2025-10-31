@@ -10,6 +10,8 @@ PACKET_STRUCTURE_MAPPING: dict[PacketID, Type[PacketStructureBase]] = {
     PacketID.EVENT: PacketEventData,
 }
 
+HEADER_SIZE = PacketHeader.sizeof()
+
 
 @dataclass
 class ParsedPacket:
@@ -26,7 +28,7 @@ class ParsedPacket:
 
 def parse_packet(data: bytes) -> ParsedPacket:
     """
-    Parse the packet header from the given data bytes.
+    Parse the received data into a ParsedPacket instance.
     """
     header = PacketHeader.from_buffer_copy(data)
 
@@ -49,4 +51,5 @@ def _from_mapping(id: PacketID, data: bytes) -> PacketStructureBase:
     if not packet_class:
         raise NotImplementedError(f"No parser implemented for PacketID {id}")
 
-    return packet_class.from_buffer_copy(data)
+    # Discard the header before parsing the payload
+    return packet_class.from_buffer_copy(data[HEADER_SIZE:])
