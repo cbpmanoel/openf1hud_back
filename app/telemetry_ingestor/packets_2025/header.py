@@ -2,9 +2,6 @@ import ctypes
 from .common import PacketStructureBase, PacketID
 
 
-HEADER_SIZE = 29  # Size of the packet header in bytes
-
-
 class PacketHeader(PacketStructureBase):
     """
     Structure representing the header of an F1 2025 telemetry data packet, present in all packets.
