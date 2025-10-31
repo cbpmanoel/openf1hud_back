@@ -2,10 +2,11 @@
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+import uvicorn
 
-from .utils.network import get_default_ip_address
-from .telemetry_ingestor.listener import TelemetryListener, F1_TELEMETRY_PORT
-from .telemetry_ingestor.service import process_telemetry_data
+from utils.network import get_default_ip_address
+from telemetry_ingestor.listener import TelemetryListener, F1_TELEMETRY_PORT
+from telemetry_ingestor.service import process_telemetry_data
 
 
 listener = TelemetryListener(data_callback=process_telemetry_data)
@@ -42,3 +43,7 @@ app = FastAPI(lifespan=lifespan)
 @app.get("/")
 def root():
     return {"message": "F1 2025 Telemetry Ingestor is running."}
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
