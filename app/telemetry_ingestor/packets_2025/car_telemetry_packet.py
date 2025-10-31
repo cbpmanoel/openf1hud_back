@@ -1,31 +1,41 @@
 from .common import PacketStructureBase, MAX_CARS
 from enum import IntEnum
 import ctypes
+
+
+class DRIVING_SURFACE(IntEnum):
+    """
+    Enumeration for different driving surface types.
+    """
+    TARMAC = 0
+    RUMBLE_STRIP = 1
+    CONCRETE = 2
+    ROCK = 3
+    GRAVEL = 4
+    MUD = 5
+    SAND = 6
+    GRASS = 7
+    WATER = 8
+    COBBLESTONE = 9
+    METAL = 10
+    RIDGED = 11
     
     
+class WHEEL_POSITION_INDEX(IntEnum):
+    """
+    Enumeration for wheel position indices.
+    """
+    REAR_LEFT = 0
+    REAR_RIGHT = 1
+    FRONT_LEFT = 2
+    FRONT_RIGHT = 3
+
+
 class CarTelemetryData(PacketStructureBase):
     """
-    Telemetry data for a single car.
+    Telemetry data for a single car.   
     """
-    
-    class DRIVING_SURFACE(IntEnum):
-        """
-        Enumeration for different driving surface types.
-        """
-        TARMAC = 0
-        RUMBLE_STRIP = 1
-        CONCRETE = 2
-        ROCK = 3
-        GRAVEL = 4
-        MUD = 5
-        SAND = 6
-        GRASS = 7
-        WATER = 8
-        COBBLESTONE = 9
-        METAL = 10
-        RIDGED = 11
-        
-    
+ 
     _fields_ = [
         ("speed", ctypes.c_uint16),                         # Speed of car in kilometres per hour
         ("throttle", ctypes.c_float),                       # Amount of throttle applied (0.0 to 1.0)
