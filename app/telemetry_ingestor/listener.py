@@ -78,7 +78,6 @@ class UDPProtocol(asyncio.DatagramProtocol):
         self.data_callback = data_callback
 
     def datagram_received(self, data: bytes, addr):
-        print(f"Data received from {addr}, length: {len(data)} bytes")
         asyncio.create_task(self.data_callback(data))
 
     def error_received(self, exc):
