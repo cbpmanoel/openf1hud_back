@@ -2,14 +2,24 @@ from dataclasses import dataclass
 from typing import Type
 
 from ..packets_2025.common import PacketID, PacketStructureBase
-from ..packets_2025.header_packet import PacketHeader
-from ..packets_2025.event_data_packet import PacketEventData
-from ..packets_2025.car_telemetry_packet import PacketCarTelemetryData
+from ..packets_2025 import (
+    PacketCarTelemetryData,
+    PacketEventData,
+    PacketHeader,
+    PacketLapData,
+    PacketMotionData,
+    PacketParticipantsData,
+    PacketSessionData,
+)
 
 
 PACKET_STRUCTURE_MAPPING: dict[PacketID, Type[PacketStructureBase]] = {
-    PacketID.EVENT: PacketEventData,
     PacketID.CAR_TELEMETRY: PacketCarTelemetryData,
+    PacketID.EVENT: PacketEventData,
+    PacketID.LAP_DATA: PacketLapData,
+    PacketID.MOTION: PacketMotionData,
+    PacketID.PARTICIPANTS: PacketParticipantsData,
+    PacketID.SESSION: PacketSessionData,
 }
 
 HEADER_SIZE = PacketHeader.sizeof()
