@@ -4,10 +4,12 @@ from typing import Type
 from ..packets_2025.common import PacketID, PacketStructureBase
 from ..packets_2025.header import PacketHeader
 from ..packets_2025.event_data import PacketEventData
+from ..packets_2025.car_telemetry import PacketCarTelemetryData
 
 
 PACKET_STRUCTURE_MAPPING: dict[PacketID, Type[PacketStructureBase]] = {
     PacketID.EVENT: PacketEventData,
+    PacketID.CAR_TELEMETRY: PacketCarTelemetryData,
 }
 
 HEADER_SIZE = PacketHeader.sizeof()
