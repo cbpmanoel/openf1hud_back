@@ -1,4 +1,4 @@
-from .common import PacketStructureBase
+from .common import PacketStructureBase, MAX_CARS
 from enum import IntEnum
 import ctypes
     
@@ -71,7 +71,7 @@ class PacketCarTelemetryData(PacketStructureBase):
     
     
     _fields_ = [
-        ("car_telemetry_data", CarTelemetryData * 22),  # Array of telemetry data for all cars on track
+        ("car_telemetry_data", CarTelemetryData * MAX_CARS),  # Array of telemetry data for all cars on track
         ("mfd_panel_index", ctypes.c_uint8),                  # Index of MFD panel open
         ("mfd_panel_index_secondary_player", ctypes.c_uint8), # Index of MFD panel open for secondary player
         ("suggested_gear", ctypes.c_int8),                    # Suggested gear for the player (1-8, 0 if no gear suggested)

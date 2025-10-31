@@ -1,6 +1,7 @@
 import ctypes
 from enum import IntEnum
 
+MAX_CARS = 22  # Maximum number of cars in an F1 2025 session
 
 class PacketID(IntEnum):
     """
